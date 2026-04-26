@@ -1,4 +1,4 @@
-"""media_interceptor/config.py — 全局配置与魔术数字映射"""
+"""media_interceptor/config.py — 全局配置与魔术数字映射（增强版）"""
 
 from pathlib import Path
 
@@ -9,7 +9,7 @@ MAGIC_MAP = {
     b"GIF87a":                   ".gif",
     b"GIF89a":                   ".gif",
     b"%PDF":                     ".pdf",
-    b"RIFF":                     ".webp",   # 需二次确认 WEBP 标记
+    b"RIFF":                     ".riff",    # 需二次确认（WEBP/WAV/AVI）
     b"PK\x03\x04":              ".zip",     # 也可能是 docx/xlsx/pptx
     b"\x1a\x45\xdf\xa3":        ".webm",    # 也可能是 mkv
     b"\x00\x00\x00\x18ftypmp4": ".mp4",
@@ -23,6 +23,13 @@ MAGIC_MAP = {
     b"\x1f\x8b":                 ".gz",
     b"BM":                       ".bmp",
     b"\x00\x00\x01\x00":        ".ico",
+}
+
+# ── RIFF 容器子类型映射 ────────────────────────────────
+RIFF_SUBTYPES = {
+    b"WEBP": ".webp",
+    b"WAVE": ".wav",
+    b"AVI ": ".avi",
 }
 
 # ── MIME → 扩展名映射（用于 data:URI 解析）──────────────

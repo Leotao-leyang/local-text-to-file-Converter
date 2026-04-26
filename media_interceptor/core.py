@@ -1,11 +1,10 @@
 """media_interceptor/core.py — 核心解码/识别引擎"""
 
 import re
-import os
 from pathlib import Path
 from dataclasses import dataclass, field
 
-from .config import MAGIC_MAP, MIME_EXT_MAP, DEFAULT_OUT_DIR, MIN_BASE64_LEN, MAX_BLOB_SIZE
+from .config import MAGIC_MAP, MIME_EXT_MAP, RIFF_SUBTYPES, DEFAULT_OUT_DIR, MIN_BASE64_LEN, MAX_BLOB_SIZE
 from .utils import (
     decode_html_entities,
     decode_url_encoding,
@@ -144,12 +143,24 @@ class MediaInterceptor:
         根据魔术数字检测媒体类型。
         返回 (类型名, 扩展名)，未识别返回 ("UNKNOWN", ".bin")。
         """
+        # ── RIFF 容器需要二次确认 ──────────────────────────
+        if data[:4] == b"RIFF" and len(data) >= 12:
+            subtype = data[8:12]
+            if subtype in RIFF_SUBTYPES:
+                ext = RIFF_SUBTYPES[subtype]
+                type_name = ext.lstrip('.').upper()
+                return type_name, ext
+            # 未知 RIFF 子类型
+            return "RIFF", ".riff"
+
+        # ── 常规魔术数字匹配 ──────────────────────────────
         for magic, ext in MAGIC_MAP.items():
             if data[:len(magic)] == magic:
                 type_name = ext.lstrip('.').upper()
                 if type_name == "JPG":
                     type_name = "JPEG"
                 return type_name, ext
+
         return "UNKNOWN", ".bin"
 
     # ── 内部方法 ────────────────────────────────────────
