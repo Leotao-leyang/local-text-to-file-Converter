@@ -1,0 +1,9 @@
+{
+    "mcpServers": {
+        "media-interceptor": {
+            "command": "python",
+            "args": ["-m", "media_interceptor.mcp_server"],
+            "cwd": "E:/dev/projects/grok处理"
+        }
+    }
+}
